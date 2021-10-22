@@ -1,0 +1,28 @@
+{
+  "name": "IDFI wallet",
+  "description": "idecentralize.finance wallet",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Madeindreams/mid-blockchain-node.git"
+  },
+  "author": "Ian Dorion",
+  "license": "MIT",
+  "homepage": "https://idecentralize.finance",
+  "dependencies": {
+    "base58-encode": "^0.2.0",
+    "bip39": "^3.0.3",
+    "create-hash": "^1.2.0",
+    "dotenv": "^8.2.0",
+    "eth-ecies": "^1.0.6",
+    "ethereumjs-util": "^7.1.3",
+    "ethers": "^5.0.24",
+    "express": "^4.10.6",
+    "hdkey": "^2.0.1",
+    "promise": "^8.1.0",
+    "request": "^2.88.2",
+    "socket.io": "^4.3.1",
+    "web3": "^1.3.0",
+    "wif": "^2.0.6"
+  }
+}
