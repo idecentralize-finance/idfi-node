@@ -1,14 +1,17 @@
 {
-  "name": "IDFI wallet",
-  "description": "idecentralize.finance wallet",
+  "name": "idfi-node",
+  "description": "idecentralize.finance Social Network Node",
   "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/Madeindreams/mid-blockchain-node.git"
   },
   "author": "Ian Dorion",
-  "license": "MIT",
+  "license": "GPL-3.0",
   "homepage": "https://idecentralize.finance",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "base58-encode": "^0.2.0",
     "bip39": "^3.0.3",
