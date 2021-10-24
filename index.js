@@ -1,5 +1,6 @@
 require('dotenv').config()
-//dotenv.config({ silent: true })
+const config = require('./config.js').config
+const publicIp = require('public-ip');
 const readline =require('readline')
 const fs = require('fs')
 const Node = require('./class/Node.js').Node
@@ -8,14 +9,14 @@ const seedGen  = require('./modules/BTC/bip39-seed.js').seedGen
 const mnemGen = require('./modules/BTC/bip39-seed.js').mnemGen
 const btcHDW = require('./modules/BTC/btc.js').btcHDW
 const ethHDW = require('./modules/ETH/eth.js').ethHDW
-const midNode = require('./modules/mid-node.js').midNode
+const midNode = require('./modules/idfi-rpc.js').midNode
 const loadKey  = require('./modules/keystore.js').loadKey
 const saveKey = require('./modules/keystore.js').saveKey
 const ethers = require("ethers")
 const Blockchain = require('./class/Blockchain.js').Blockchain
 const Transaction =  require('./class/Transaction.js').Transaction
 
-let node = new Node(1, process.env.MID_NODE_HOST, process.env.MID_NODE_PORT, 1, new Date().getTime())
+
 
 
 // if we have a wallet
@@ -64,7 +65,7 @@ else {  // file dont exist
 
     if (action === 'r') {
 
-      nx.question('\x1b[0mType your 12 word mnemonic \x1b[32m >', async (rmnemonic) => {
+      nx.question('\x1b[0m Type your 12 word mnemonic \x1b[32m >', async (rmnemonic) => {
         const seed = await seedGen(rmnemonic)
         const seed2 = ethers.utils.mnemonicToSeed(rmnemonic)
 
@@ -192,6 +193,21 @@ const signMessage = async (wallet, message) =>{
   return signMsg
 }
 
+
+// start the node
+const startNode = async () => {
+  let ip = await publicIp.v4()
+  let node = new Node(1, ip, config.node.port, 1, config.node.name)
+   midNode(node);
+}
+
+
+
+
+
+
+
+
 async function run(seed) {
 
   // Generate BTC HD Wallet from seed.
@@ -236,9 +252,9 @@ async function run(seed) {
   
   const tx = new Transaction(wallet.address, wallet.address, 1, encryptedData);
   await tx.signTransaction(wallet)
-
+ 
   const chain = new Blockchain()
-
+ 
   chain.minePendingTransactions(wallet.address)
 
   chain.addTransaction(wallet,tx)
@@ -248,9 +264,9 @@ async function run(seed) {
   console.log(chain)
   chain.getBalanceOfAddress(wallet.address)
 
-  midNode(node);
 
 
+  await startNode()
 
 }
 

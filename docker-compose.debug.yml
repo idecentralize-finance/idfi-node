@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  idfiwallet:
+    image: idfiwallet
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: development
+    ports:
+      - 9998:9998
+      - 9229:9229
+    command: ["node", "--inspect=0.0.0.0:9229", "index.js"]

@@ -21,7 +21,7 @@ class Block {
    * @returns {string}
    */
   calculateHash() {
-    return crypto.createHash('sha256').update(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).digest('hex');
+    return '0x'+crypto.createHash('sha256').update(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).digest('hex');
   }
 
   /**
@@ -29,7 +29,7 @@ class Block {
    * @param {number} difficulty
    */
   mineBlock(difficulty) {
-    while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join('0')) {
+    while (this.hash.substring(2, difficulty+2) !== Array(difficulty + 1).join('0')) {
       this.nonce++;
       this.hash = this.calculateHash();
       console.log(this.hash)

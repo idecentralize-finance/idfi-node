@@ -1,15 +1,10 @@
-FROM node:16.4.1
-
-WORKDIR /code
-
+FROM node:14-alpine
+ENV NODE_ENV=production
+WORKDIR /usr/src/app
+COPY ["package.json", "package-lock.json*", "npm-shrinkwrap.json*", "./"]
+RUN npm install --production --silent && mv node_modules ../
+COPY . .
 EXPOSE 9998
-
-ENV HOST 0.0.0.0
-
-COPY package.json /code/package.json
-
-RUN npm install
-
-COPY . /code
-
-CMD [ "node", "index.js"]
+RUN chown -R node /usr/src/app
+USER node
+CMD ["npm", "start"]
