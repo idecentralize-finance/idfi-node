@@ -3,16 +3,29 @@ const crypto = require('crypto')
 class Block {
 
  /**
+     * @param {number} blockNum
      * @param {number} timestamp
+     * @param {string} transactionRoot
      * @param {Transaction[]} transactions
-     * @param {string} previousHash
+     * @param {string} parentHash
+     * @param {string} parentHash
+     * @param {number} number
+     * 
      */
-  constructor(blockNum, timestamp, transactions, previousHash = '') {
-    this.block = blockNum;
-    this.previousHash = previousHash;
-    this.timestamp = timestamp;
-    this.transactions = transactions;
+  constructor(blockNum, timestamp, transactionRoot, transactions, receiptRoot, parentHash = '') {
+    this.number = blockNum._hex;
+    this.parentHash = parentHash;
     this.nonce = 0;
+    this.sha3Uncles;                                                // wont be used,
+    this.timestamp = timestamp;                                     // the time the block was created
+    this.transactionRoot = transactionRoot;                         // transactions merkle 
+    this.transactions = transactions;
+    this.logsBloom = "0x0";
+    this.receiptRoot = receiptRoot;                                 // receipt merkle 
+    this.size;
+    this.gasUsed;
+    this.difficulty;
+    this.miner;
     this.hash = this.calculateHash();
   }
 
@@ -32,7 +45,7 @@ class Block {
     while (this.hash.substring(2, difficulty+2) !== Array(difficulty + 1).join('0')) {
       this.nonce++;
       this.hash = this.calculateHash();
-      console.log(this.hash)
+      //console.log(this.hash)
     }
 
     console.log(`Block mined: ${this.hash}`);

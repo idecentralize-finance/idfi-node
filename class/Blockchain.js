@@ -1,5 +1,6 @@
+const ethers = require('ethers')
 const Block = require('./Block.js').Block
-
+const ReceiptTrie = require('./ReceiptTrie.js')
 const Transaction =require('./Transaction.js').Transaction
 
 
@@ -11,14 +12,16 @@ class Blockchain {
      this.chain = [this.createGenesisBlock()];
      this.difficulty = 2;
      this.pendingTransactions = [];
-     this.miningReward = 50;
+     this.transactionReceipt = new ReceiptTrie();
+     this.transactions = new ReceiptTrie();
+     this.miningReward = new ethers.BigNumber.from(ethers.utils.parseEther("50"));
    }
 
       /**
       * @returns {Block}
       */
       createGenesisBlock() {
-        return new Block(0,Date.now(), [], '0');
+        return new Block(new ethers.BigNumber.from(1),Date.now(), [], '0');
       }
 
 
@@ -35,15 +38,52 @@ class Blockchain {
    * @param {string} miningRewardAddress
    */
   minePendingTransactions(miningRewardAddress) {
-    const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
-    this.pendingTransactions.push(rewardTx);
+    // create the transaction for the miner
+    const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward,"blockreward");
 
-    
-    const block = new Block(this.chain.length, Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+   // this.pendingTransactions.push(rewardTx);
+    this.pendingTransactions.push(rewardTx.hash);
+    this.transactions.add(rewardTx)
+
+
+
+    const block = new Block(new ethers.BigNumber.from(this.chain.length+1), Date.now(), "0x", this.pendingTransactions, this.transactionReceipt.root  ,this.getLatestBlock().hash);
     block.mineBlock(this.difficulty);
-
+    console.log('Block Hash',block.hash)
     console.log('Block successfully mined!');
     this.chain.push(block);
+    console.log("tx ??",this.chain[this.chain.length-1].transactions)
+
+
+    // create the transaction receipt root
+        let index = new ethers.BigNumber.from(0)
+
+        this.pendingTransactions.forEach(hash => {
+         console.log('TX HASH => ',hash)
+         const transaction = this.transactions.get(hash)
+          const receipt = {
+           blockHash : block.hash,
+           blockNumber : block.number,
+           contractAddress : null,
+           cumulativeGasUsed: "0x04",
+           from : transaction.from,
+           gasUsed : "",
+           logs : "",
+           logsBloom : "",
+           to : transaction.to,
+           transactionHash : transaction.hash,
+           transactionIndex : null,
+           postTransactionState : "",
+           status : "0x1"
+          }
+
+ 
+          this.transactionReceipt.add(receipt);
+          
+          index = index.add(new ethers.BigNumber.from(1))
+        });
+
+    // remove transaction mined from pending
 
     this.pendingTransactions = [];
   }
@@ -52,27 +92,29 @@ class Blockchain {
    *
    * @param {Transaction} transaction
    */
-  addTransaction(wallet,transaction) {
+  addTransaction(transaction) {
     if (!transaction.from || !transaction.to) {
       throw new Error('Transaction must include from and to address');
     }
 
     // Verify the transactiion
-    if (!transaction.isValid(wallet)) {
+    if (!transaction.isValid()) {
       throw new Error('Cannot add invalid transaction to chain');
     }
     
-    if (transaction.amount <= 0) {
-      throw new Error('Transaction amount should be higher than 0');
-    }
+    // if (transaction.amount <= 0) {
+    //   throw new Error('Transaction amount should be higher than 0');
+    // }
     
     // Making sure that the amount sent is not greater than existing balance
-    if (this.getBalanceOfAddress(transaction.from) < transaction.amount) {
+    if (  ethers.utils.formatEther(this.getBalanceOfAddress(transaction.from))  <    ethers.utils.formatEther(transaction.value)   ) {
       
       throw new Error('Not enough balance');
     }
-
-    this.pendingTransactions.push(transaction);
+    
+    
+    this.pendingTransactions.push(transaction.hash);
+    this.transactions.add(transaction)
     console.log('transaction added: ', transaction);
   }
 
@@ -82,16 +124,29 @@ class Blockchain {
    * @returns {number} The balance of the wallet
    */
   getBalanceOfAddress(address) {
-    let balance = 0;
+    address = ethers.utils.getAddress(address)
+    let balance = ethers.BigNumber.from(0);
+    // console.log('The address',address)
+
 
     for (const block of this.chain) {
-      for (const trans of block.transactions) {
-        if (trans.from === address) {
-          balance -= trans.amount;
-        }
+      for (const hash of block.transactions) {
+        console.log('balance > Block > hash',hash)
 
-        if (trans.to === address) {
-          balance += trans.amount;
+        if(hash === '0'){
+          
+        }else{
+          const tx = this.transactions.get(hash)
+          if (tx.from === address) {
+           // console.log('removed',trans.value)
+            balance = balance.sub(tx.value);
+          }
+  
+          if (tx.to === address) {
+            //console.log('added',trans.value)
+            balance = balance.add(tx.value);
+          }
+
         }
       }
     }
@@ -119,6 +174,23 @@ class Blockchain {
    console.log('get transactions for wallet count: %s', txs.length);
     return txs;
   }
+
+    /**
+   *
+   * @param  {string} hash
+   * @return {Block}
+   */
+     getBlockByHash(hash) {
+      
+  
+      for (const block of this.chain) {
+          if (block.hash === hash) {
+            return block;
+          }
+      }
+  
+     console.log('get block by hash: %s', hash);
+    }
 
   /**
    *

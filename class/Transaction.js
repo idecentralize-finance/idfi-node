@@ -1,4 +1,5 @@
 const crypto = require('crypto')
+const ethers = require('ethers')
 
 class Transaction {
     /**
@@ -9,12 +10,14 @@ class Transaction {
      */
 
    constructor(from, to, amount, data) {
+    
     this.from = from;
     this.to = to;
-    this.amount = amount;
+    this.value = amount;
     this.timestamp = Date.now();
-    this.customData = data;
-    this.txHash 
+    this.data = data;
+    this.hash = this.calculateHash();
+   
   }
 
   /**
@@ -22,8 +25,14 @@ class Transaction {
    *
    * @returns {string}
    */
-  async calculateHash() {
-    return  crypto.createHash('sha256').update(this.from + this.to + this.amount + this.timestamp + this.customData).digest('hex');
+   calculateHash() {
+   
+    const hash = crypto.createHash('sha256')
+    hash.update(this.from + this.to + this.value + this.timestamp + this.data)
+    //hash.digest('hex')
+
+    
+   return '0x'+hash.digest('hex')
   }
 
   /**
@@ -33,7 +42,8 @@ class Transaction {
    */
   async signTransaction(wallet) {
    
-    //console.log(wallet)
+    console.log(wallet)
+
     if (wallet.address !== this.from) {
       console.log('real sender:',wallet.address )
       console.log('pretended sender : ', this.from)
@@ -41,9 +51,9 @@ class Transaction {
       throw new Error('You cannot sign transactions for other wallets!');
     }
 
-    this.txHash = this.calculateHash();
-     
-    this.signature = await wallet.signTransaction(this.txHash)
+      
+     console.log(this.hash) 
+    this.signature = await wallet.signTransaction(this.hash)
     console.log('SIGNATURE : ',this.signature)
   }
 
@@ -53,15 +63,16 @@ class Transaction {
    *
    * @returns {boolean}
    */
-  async isValid(wallet) {
+  async isValid() {
     return new Promise(async  resolve => { 
     if (this.from === null) return resolve(true);
 
     if (!this.signature || this.signature.length === 0) {
       throw new Error('No signature in this transaction');
     }
- 
-    const publicKey = await wallet.checkTransaction(this.txHash,this.signature).from
+    const parsedTx = ethers.utils.parseTransaction(this.signature)
+
+    const publicKey = parsedTx.from
 
     if(publicKey !== this.from){
       throw new Error('Invalid Signature');
@@ -71,8 +82,6 @@ class Transaction {
   })
       
   }
-
-
 
 }
 

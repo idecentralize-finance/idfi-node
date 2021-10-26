@@ -3,7 +3,7 @@ class Node {
     this.id = id
     this.name = name
     this.ip = ip
-    this.port = port //default 21337
+    this.port = port                      
     this.miners  = miners      
     this.timestamp = new Date().getTime()
   }

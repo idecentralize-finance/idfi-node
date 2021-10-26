@@ -13,6 +13,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@metamask/eth-sig-util": "^4.0.0",
     "base58-encode": "^0.2.0",
     "bip39": "^3.0.3",
     "body-parser": "^1.19.0",

@@ -9,7 +9,7 @@ const seedGen  = require('./modules/BTC/bip39-seed.js').seedGen
 const mnemGen = require('./modules/BTC/bip39-seed.js').mnemGen
 const btcHDW = require('./modules/BTC/btc.js').btcHDW
 const ethHDW = require('./modules/ETH/eth.js').ethHDW
-const midNode = require('./modules/idfi-rpc.js').midNode
+const idfiRPC = require('./modules/idfi-rpc.js').RPC
 const loadKey  = require('./modules/keystore.js').loadKey
 const saveKey = require('./modules/keystore.js').saveKey
 const ethers = require("ethers")
@@ -197,8 +197,10 @@ const signMessage = async (wallet, message) =>{
 // start the node
 const startNode = async () => {
   let ip = await publicIp.v4()
-  let node = new Node(1, ip, config.node.port, 1, config.node.name)
-   midNode(node);
+ 
+  const rpc = new idfiRPC(1, ip, config.node.port, 1, config.node.name);
+  
+  return rpc
 }
 
 
@@ -210,6 +212,8 @@ const startNode = async () => {
 
 async function run(seed) {
 
+  const rpc =await startNode()
+
   // Generate BTC HD Wallet from seed.
   let btcAddress = await btcHDW(seed)
   console.log("\x1b[32m%s\x1b[0m", "₿ ADDRESS : ", btcAddress)
@@ -217,56 +221,65 @@ async function run(seed) {
   // Generate ETH HD Wallet from seed.
   const ethNode = await ethHDW(seed)
   console.log("\x1b[32m%s\x1b[0m", "⧫ ADDRESS : ", ethNode.address)
-  const wallet = new ethers.Wallet( ethNode.privateKey)
-  const keys = wallet._signingKey()
+  const wallet = new ethers.Wallet(ethNode.privateKey)
+  //const keys = wallet._signingKey()
   //console.log('WALLET :',wallet)
-  const pubKey = keys.publicKey.substr(4,keys.publicKey.length)
-  const prvKey = keys.privateKey.substr(2,keys.privateKey.length)
+  //const pubKey = keys.publicKey.substr(4,keys.publicKey.length)
+  //const prvKey = keys.privateKey.substr(2,keys.privateKey.length)
   
-  const msg = "This is my message to you"
-  console.log('PUBLIC KEY :',pubKey,pubKey.length)
-  //console.log('PRIVATE KEY', prvKey,prvKey.length)
+  // const msg = "This is my message to you"
+  // console.log('PUBLIC KEY :',pubKey,pubKey.length)
+  // //console.log('PRIVATE KEY', prvKey,prvKey.length)
 
-  const encryptedData = encrypt(pubKey,msg)
-  //console.log('ENCRYPTED :',encryptedData)
-  const decryptedData = decrypt(prvKey,encryptedData)
-  //console.log('DECRYPTED',decryptedData)
+  // const encryptedData = encrypt(pubKey,msg)
+  // //console.log('ENCRYPTED :',encryptedData)
+  // const decryptedData = decrypt(prvKey,encryptedData)
+  // //console.log('DECRYPTED',decryptedData)
   
-  //signature of encrypted message
-  const signature = await signMessage(wallet,encryptedData)
-  console.log('Signature :',signature)
+  // //signature of encrypted message
+  // const signature = await signMessage(wallet,encryptedData)
+  // console.log('Signature :',signature)
  
-  // verify the signature 
-  const recoveredAddress = ethers.utils.verifyMessage(encryptedData, signature)
-  console.log('Recovered :',recoveredAddress)
+  // // verify the signature 
+  // const recoveredAddress = ethers.utils.verifyMessage(encryptedData, signature)
+  // console.log('Recovered :',recoveredAddress)
 
-  //recover the uncompressed public key from signature
-  const recoveredPBK = ethers.utils.recoverPublicKey(ethers.utils.arrayify(ethers.utils.hashMessage(encryptedData)), signature);
-  console.log('Recovered PBK',recoveredPBK)
+  // //recover the uncompressed public key from signature
+  // const recoveredPBK = ethers.utils.recoverPublicKey(ethers.utils.arrayify(ethers.utils.hashMessage(encryptedData)), signature);
+  // console.log('Recovered PBK',recoveredPBK)
   
+  // console.log('Compressed PBK :',ethers.utils.computePublicKey(keys.publicKey,true))
+  let amount = new ethers.BigNumber.from(0)
+  const tx1 = new Transaction(wallet.address, wallet.address, amount, "0x0000");
+  console.log('tx added', tx1)
 
-  console.log('Compressed PBK :',ethers.utils.computePublicKey(keys.publicKey,true))
+  //await tx1.signTransaction(wallet)
+  //rpc.chain.addTransaction(tx1)
 
-  console.log('unCompressed PBK :',ethers.utils.computePublicKey(keys.privateKey))
 
   
-  const tx = new Transaction(wallet.address, wallet.address, 1, encryptedData);
-  await tx.signTransaction(wallet)
+  rpc.chain.minePendingTransactions(wallet.address)
+
+  rpc.chain.getBalanceOfAddress(wallet.address)
+
+  console.log(rpc.chain)
+  // console.log('unCompressed PBK :',ethers.utils.computePublicKey(keys.privateKey))
+
+ // const tx = new Transaction(wallet.address, wallet.address, 1, null);
+ // await tx.signTransaction(wallet)
+
+  // const chain = new Blockchain()
  
-  const chain = new Blockchain()
- 
-  chain.minePendingTransactions(wallet.address)
+  // chain.minePendingTransactions(wallet.address)
 
-  chain.addTransaction(wallet,tx)
+ // rpc.chain.addTransaction(wallet,tx)
 
-  chain.minePendingTransactions(wallet.address)
+ // rpc.chain.minePendingTransactions(wallet.address)
 
-  console.log(chain)
-  chain.getBalanceOfAddress(wallet.address)
+  // console.log(chain)
+  // chain.getBalanceOfAddress(wallet.address)
 
-
-
-  await startNode()
+ // await startNode()
 
 }
 
