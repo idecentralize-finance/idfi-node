@@ -17,7 +17,7 @@ class RPC {
       this.ws;
       this.chain = new Blockchain();  
       this.receiptTrie = []
-      this.init(id, ip, port,  name)
+      //this.init(id, ip, port,  name)
   }   
 
   /**
