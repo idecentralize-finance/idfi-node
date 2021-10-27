@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai'
+import  {expect}  from 'chai'
 import RPC from '../modules/idfi-rpc.js'
 
 describe('Chain Difficulty', () => {
