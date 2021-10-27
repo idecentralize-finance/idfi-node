@@ -2,6 +2,7 @@
   "name": "idfi-rpc",
   "description": "An RPC Endpoint for the DSN",
   "version": "0.0.1",
+  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Madeindreams/mid-blockchain-node.git"
