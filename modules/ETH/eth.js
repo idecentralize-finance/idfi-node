@@ -1,4 +1,4 @@
-const ethers =require('ethers')
+import ethers from 'ethers'
 
 
 const ethHDW = async (seed) =>{
@@ -11,6 +11,6 @@ const ethHDW = async (seed) =>{
     })
 }
 
-module.exports = {
-   ethHDW
-  };
+
+export default ethHDW
+  

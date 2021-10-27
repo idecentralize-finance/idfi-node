@@ -1,22 +1,16 @@
-require('dotenv').config()
-const config = require('./config.js').config
-const publicIp = require('public-ip');
-const readline =require('readline')
-const fs = require('fs')
-const Node = require('./class/Node.js').Node
-const ecies = require("eth-ecies");
-const seedGen  = require('./modules/BTC/bip39-seed.js').seedGen
-const mnemGen = require('./modules/BTC/bip39-seed.js').mnemGen
-const btcHDW = require('./modules/BTC/btc.js').btcHDW
-const ethHDW = require('./modules/ETH/eth.js').ethHDW
-const idfiRPC = require('./modules/idfi-rpc.js').RPC
-const loadKey  = require('./modules/keystore.js').loadKey
-const saveKey = require('./modules/keystore.js').saveKey
-const ethers = require("ethers")
-const Blockchain = require('./class/Blockchain.js').Blockchain
-const Transaction =  require('./class/Transaction.js').Transaction
-
-
+import dotenv from 'dotenv'
+dotenv.config()
+import config from './config.js'
+import  readline from 'readline'
+import  fs from 'fs'
+//import nst ecies = require("eth-ecies");
+import  {seedGen, mnemGen } from './modules/BTC/bip39-seed.js'
+import  btcHDW from './modules/BTC/btc.js'
+import  ethHDW  from './modules/ETH/eth.js'
+import  {loadKey, saveKey}  from './modules/keystore.js'
+import  ethers from "ethers"
+import  Transaction from './class/Transaction.js'
+import  RPC from'./modules/idfi-rpc.js'
 
 
 // if we have a wallet
@@ -173,32 +167,32 @@ else {  // file dont exist
 }
 
 
-function encrypt(publicKey, data) {
-  let userPublicKey = new Buffer.from(publicKey, 'hex');
-  let bufferData = new Buffer.from(data);
-  let encryptedData = ecies.encrypt(userPublicKey, bufferData);
-  return encryptedData.toString('base64')
-}
+// function encrypt(publicKey, data) {
+//   let userPublicKey = new Buffer.from(publicKey, 'hex');
+//   let bufferData = new Buffer.from(data);
+//   let encryptedData = ecies.encrypt(userPublicKey, bufferData);
+//   return encryptedData.toString('base64')
+// }
 
 
-function decrypt(privateKey, encryptedData) {
-  let userPrivateKey = new Buffer.from(privateKey, 'hex');
-  let bufferEncryptedData = new Buffer.from(encryptedData, 'base64');
-  let decryptedData = ecies.decrypt(userPrivateKey, bufferEncryptedData);
-  return decryptedData.toString('utf8');
-}
+// function decrypt(privateKey, encryptedData) {
+//   let userPrivateKey = new Buffer.from(privateKey, 'hex');
+//   let bufferEncryptedData = new Buffer.from(encryptedData, 'base64');
+//   let decryptedData = ecies.decrypt(userPrivateKey, bufferEncryptedData);
+//   return decryptedData.toString('utf8');
+// }
 
-const signMessage = async (wallet, message) =>{
-  let signMsg = await wallet.signMessage(message)
-  return signMsg
-}
+// const signMessage = async (wallet, message) =>{
+//   let signMsg = await wallet.signMessage(message)
+//   return signMsg
+// }
 
 
-// start the node
-const startNode = async () => {
-  let ip = await publicIp.v4()
+/// start the node
+const startRPC = async () => {
+  
  
-  const rpc = new idfiRPC(1, ip, config.node.port, 1, config.node.name);
+  const rpc = new RPC(1, "0.0.0.0", config.node.port, config.node.name);
   
   return rpc
 }
@@ -212,7 +206,7 @@ const startNode = async () => {
 
 async function run(seed) {
 
-  const rpc =await startNode()
+  const rpc = await startRPC()
 
   // Generate BTC HD Wallet from seed.
   let btcAddress = await btcHDW(seed)
@@ -251,18 +245,18 @@ async function run(seed) {
   // console.log('Compressed PBK :',ethers.utils.computePublicKey(keys.publicKey,true))
   let amount = new ethers.BigNumber.from(0)
   const tx1 = new Transaction(wallet.address, wallet.address, amount, "0x0000");
-  console.log('tx added', tx1)
+  //console.log('tx added', tx1)
 
   //await tx1.signTransaction(wallet)
   //rpc.chain.addTransaction(tx1)
 
 
-  
+
   rpc.chain.minePendingTransactions(wallet.address)
 
   rpc.chain.getBalanceOfAddress(wallet.address)
 
-  console.log(rpc.chain)
+ // console.log(rpc.chain)
   // console.log('unCompressed PBK :',ethers.utils.computePublicKey(keys.privateKey))
 
  // const tx = new Transaction(wallet.address, wallet.address, 1, null);

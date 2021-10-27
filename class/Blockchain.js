@@ -1,7 +1,7 @@
-const ethers = require('ethers')
-const Block = require('./Block.js').Block
-const ReceiptTrie = require('./ReceiptTrie.js')
-const Transaction =require('./Transaction.js').Transaction
+import ethers from 'ethers'
+import Block from './Block.js'
+import ReceiptTrie from './ReceiptTrie.js'
+import Transaction from './Transaction.js'
 
 
 
@@ -50,16 +50,16 @@ class Blockchain {
     const block = new Block(new ethers.BigNumber.from(this.chain.length+1), Date.now(), "0x", this.pendingTransactions, this.transactionReceipt.root  ,this.getLatestBlock().hash);
     block.mineBlock(this.difficulty);
     console.log('Block Hash',block.hash)
-    console.log('Block successfully mined!');
+   // console.log('Block successfully mined!');
     this.chain.push(block);
-    console.log("tx ??",this.chain[this.chain.length-1].transactions)
+    //console.log("tx ??",this.chain[this.chain.length-1].transactions)
 
 
     // create the transaction receipt root
         let index = new ethers.BigNumber.from(0)
 
         this.pendingTransactions.forEach(hash => {
-         console.log('TX HASH => ',hash)
+        // console.log('TX HASH => ',hash)
          const transaction = this.transactions.get(hash)
           const receipt = {
            blockHash : block.hash,
@@ -131,7 +131,7 @@ class Blockchain {
 
     for (const block of this.chain) {
       for (const hash of block.transactions) {
-        console.log('balance > Block > hash',hash)
+       // console.log('balance > Block > hash',hash)
 
         if(hash === '0'){
           
@@ -151,7 +151,7 @@ class Blockchain {
       }
     }
 
-    console.log('BALANCE : ', balance)
+    //console.log('BALANCE : ', balance)
     return balance;
   }
 
@@ -221,6 +221,4 @@ class Blockchain {
 
 }
 
-module.exports = {
-  Blockchain
-};
+export default  Blockchain

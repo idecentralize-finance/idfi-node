@@ -1,4 +1,4 @@
-const crypto = require('crypto')
+import crypto from 'crypto'
 
 class Block {
 
@@ -66,6 +66,4 @@ class Block {
   }
 }
 
-module.exports = {
-  Block
-};
+export default Block

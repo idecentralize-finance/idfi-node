@@ -50,4 +50,4 @@ class ReceiptTrie {
     }
 }
 
-module.exports = ReceiptTrie;
+export default ReceiptTrie;

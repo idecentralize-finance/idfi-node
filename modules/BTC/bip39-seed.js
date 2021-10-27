@@ -1,7 +1,6 @@
 
-const bip39 = require('bip39')
-const HDkey = require('hdkey')
-
+import bip39 from 'bip39'
+import HDkey from 'hdkey'
 
 const mnemGen = async () =>{
   return new Promise(resolve => {
@@ -10,8 +9,6 @@ const mnemGen = async () =>{
    resolve(mnemonic)
   })
 }
-
-
 
 const seedGen = async (mnemonic) =>{
     return new Promise(resolve => {
@@ -23,13 +20,6 @@ const seedGen = async (mnemonic) =>{
     })
   }
 
-
-
-
-
-
-
-
 const rootGen = async (seed) =>{
     return new Promise(resolve => {
         
@@ -39,7 +29,7 @@ const rootGen = async (seed) =>{
     })
   }
 
-  module.exports = {
+ export {
     seedGen,
     mnemGen,
     rootGen

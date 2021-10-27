@@ -1,5 +1,5 @@
-const crypto = require('crypto')
-const ethers = require('ethers')
+import crypto from 'crypto'
+import ethers from 'ethers'
 
 class Transaction {
     /**
@@ -52,7 +52,7 @@ class Transaction {
     }
 
       
-     console.log(this.hash) 
+    // console.log(this.hash) 
     this.signature = await wallet.signTransaction(this.hash)
     console.log('SIGNATURE : ',this.signature)
   }
@@ -85,6 +85,5 @@ class Transaction {
 
 }
 
-module.exports = {
-  Transaction
-};
+
+export default Transaction

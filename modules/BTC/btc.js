@@ -1,9 +1,9 @@
-require('dotenv').config()
+import env from "dotenv"
 //dotenv.config({ silent: true })
-const HDkey = require('hdkey')
-const createHash = require('create-hash')
-const base58 = require('base58-encode')
-const wif = require('wif')
+import HDkey from 'hdkey'
+import createHash from 'create-hash'
+import base58 from 'base58-encode'
+import wif from 'wif'
 
  const btcHDW = async (seed) => {
   return new Promise(resolve => {
@@ -66,6 +66,5 @@ const wif = require('wif')
   })
 }
 
-module.exports = {
-  btcHDW
-};
+
+export default  btcHDW

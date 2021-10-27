@@ -1,20 +1,9 @@
-require('dotenv').config()
-const url = require('url')
-const path = require('path')
-const publicIp = require('public-ip');
-const util = require('ethereumjs-util');
-const express = require('express')
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require("socket.io")
-const io = new Server(server)
-const crypto = require('crypto')
-const ethers = require('ethers')
-const Blockchain = require('../class/Blockchain.js').Blockchain
-const Transaction =  require('../class/Transaction.js').Transaction
-const Node = require('../class/Node.js').Node
-const concatSig = require ('@metamask/eth-sig-util').concatSig
+
+import IDServer from "@idecentralize/simple-server"
+import ethers  from 'ethers'
+import Blockchain from '../class/Blockchain.js'
+import Transaction from '../class/Transaction.js'
+import Node from '../class/Node.js'
 
 
 class RPC {
@@ -23,12 +12,12 @@ class RPC {
   * 
   */
 
-  constructor(id, ip, port, miners, name){
+  constructor(id, ip, port, name){
       this.endpoint;
+      this.ws;
       this.chain = new Blockchain();  
       this.receiptTrie = []
-      this.init(id, ip, port, miners, name)
-      
+      this.init(id, ip, port,  name)
   }   
 
   /**
@@ -36,28 +25,11 @@ class RPC {
   * @returns {string}
   */
 
-   init(id, ip, port, miners, name) {
-  
-    console.log('\x1b[32m'  +process.env.npm_package_name + ' V'+ process.env.npm_package_version+ "\x1b[0m")
+   async init(id, ip, port, name) {
 
-    app.use(express.urlencoded({ extended: true }));
-    app.use(express.json());
-    // headers
-    app.use(function (req, res, next) {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      next();
-    });
-    // ping
-    app.get('/ping', function (req, res) {
-      const rAddress = req.socket.remoteAddress;
-      console.log("\x1b[32m%s\x1b[0m", 'Ping request from :', rAddress);
-      RPC.endpoint = new Node(id, ip, port, miners, name);
-      res.jsonp(RPC.endpoint);
-      return;
-    });
-    // post because metamask currently post
-    app.post('/', (request, response) => {
+    const server = new IDServer(port,ip,name)
+    server.app.post('/', (request, response) => {
+     // console.log('Post Request :', request.body.method);
       console.log('Post Request :', request.body.method);
     
       switch(request.body.method){
@@ -101,25 +73,8 @@ class RPC {
       }
 
     });
-    // listen for incoming HTTP
-    app.listen(process.env.PORT, process.env.HOST, () => {
-      console.log("\x1b[32m%s\x1b[0m", `listening on ${process.env.HOST} port : `, process.env.PORT);
-    })
 
-    // WebSocket
-    io.on('connection', (socket) => {
-      console.log('Client connected');
-      if (interval) {
-        clearInterval(interval);
-      }
-      interval = setInterval(() => keepDaemonAlive(socket), 1000);
-      socket.on("disconnect", () => {
-        console.log("Client disconnected");
-        clearInterval(interval);
-      });
-    });
-
-
+    server.init()
   }
 
   /**
@@ -386,6 +341,5 @@ const numberToHex = (number) => {
   return ethers.utils.hexValue(number)
 }
 
-module.exports = {
-  RPC
-};
+
+export default  RPC

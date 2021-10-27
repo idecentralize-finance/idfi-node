@@ -8,6 +8,5 @@ class Node {
     this.timestamp = new Date().getTime()
   }
 }
-module.exports = {
-  Node
-};
+
+export default Node

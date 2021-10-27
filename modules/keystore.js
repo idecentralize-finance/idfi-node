@@ -1,6 +1,6 @@
-const fs = require('fs')
-const crypto = require('crypto')
-const ethers = require('ethers')
+import fs from 'fs'
+import crypto from 'crypto'
+import ethers from 'ethers'
 
 const iv = crypto.randomBytes(16);
 
@@ -63,7 +63,7 @@ const loadKey = async (data, password) => {
 
 }
 
-module.exports = {
+export {
     saveKey,
     loadKey
   };
