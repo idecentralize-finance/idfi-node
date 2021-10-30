@@ -1,5 +1,5 @@
 {
-  "name": "idfi-rpc",
+  "name": "idfi-node",
   "description": "An RPC Endpoint for the DSN",
   "version": "0.0.1",
   "main": "index.js",
