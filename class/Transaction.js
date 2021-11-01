@@ -42,7 +42,7 @@ class Transaction {
    */
   async signTransaction(wallet) {
    
-    console.log(wallet)
+    //console.log(wallet)
 
     if (wallet.address !== this.from) {
       console.log('real sender:',wallet.address )
@@ -54,7 +54,7 @@ class Transaction {
       
     // console.log(this.hash) 
     this.signature = await wallet.signTransaction(this.hash)
-    console.log('SIGNATURE : ',this.signature)
+   // console.log('SIGNATURE : ',this.signature)
   }
 
 

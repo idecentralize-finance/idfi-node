@@ -48,7 +48,7 @@ class Block {
       //console.log(this.hash)
     }
 
-    console.log(`Block mined: ${this.hash}`);
+    //console.log(`Block mined: ${this.hash}`);
   }
 
   /**

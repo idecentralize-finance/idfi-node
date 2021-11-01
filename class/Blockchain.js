@@ -49,7 +49,7 @@ class Blockchain {
 
     const block = new Block(new ethers.BigNumber.from(this.chain.length+1), Date.now(), "0x", this.pendingTransactions, this.transactionReceipt.root  ,this.getLatestBlock().hash);
     block.mineBlock(this.difficulty);
-    console.log('Block Hash',block.hash)
+   // console.log('Block Hash',block.hash)
    // console.log('Block successfully mined!');
     this.chain.push(block);
     //console.log("tx ??",this.chain[this.chain.length-1].transactions)
