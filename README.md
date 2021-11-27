@@ -10,7 +10,7 @@ The BOT project is a blockchain where transaction can activate an event in the p
 
 The RPC can handle incoming transaction and miners request but also offers a connection to a machine device. In the development phase we will use arduino. This will make it more accessible but the concept could be applied to a CNC machine that would produce an item on demand within a transaction. The era of overproduction is over.
 
-We make use of Metamask to connect to the RPC. We also use patricia trie to validate block data. The project is meant to be an ethereum sidechain that               is a bridge between the virtual blockchain and the phisical machine. 
+We make use of Metamask to connect to the RPC. We also use patricia trie to validate block data. The project is meant to be an ethereum sidechain that               is a bridge between the virtual blockchain and the physical machine. 
 
 Currently built for arduino micro controller for development purpose but the process can evolve to an industrial application where a good being produce by machine work would be payed directly to the machines owner account. Not only you will develop a smart contract to handle transactions but you will also use smart bytecode that will operate your machine based on a set of instruction encoded like smart contract.
 
